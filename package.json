@@ -11,11 +11,15 @@
   "author": "OpenSoul",
   "license": "ISC",
   "dependencies": {
+    "@fortawesome/fontawesome-free-brands": "^5.0.13",
+    "@fortawesome/fontawesome-free-regular": "^5.0.13",
+    "@fortawesome/fontawesome-free-solid": "^5.0.13",
     "body-parser": "^1.18.3",
     "bootstrap": "^4.1.1",
     "express": "^4.16.3",
     "keccak": "^1.4.0",
     "web3": "github:ethereum/web3.js",
-    "web3-js": "^1.0.5-beta.26"
+    "web3-js": "^1.0.5-beta.26",
+    "font-awesome": "^4.7.0"
   }
 }
