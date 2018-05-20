@@ -12,6 +12,86 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+    <script src="../node_modules/web3/dist/web3-light.js"></script>
+    <script src="../node_modules/keccak/index.js"></script>
+
+    <script>
+        let web3;
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // set the provider you want from Web3.providers
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+        web3.eth.defaultAccount = web3.eth.accounts[0];
+
+        const abi = JSON.parse('[{"constant":true,"inputs":[],"name":"getBoxes","outputs":[{"name":"","type":"address[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"}],"name":"getLastState","outputs":[{"name":"ok","type":"bool"},{"name":"opened","type":"bool"},{"name":"location","type":"string"},{"name":"error","type":"string"},{"name":"timestamp","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"}],"name":"ifCanBeOpened","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"},{"name":"receiver","type":"address"}],"name":"setReceiver","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"},{"name":"secret","type":"string"}],"name":"open","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"}],"name":"getStatesCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"ok","type":"bool"},{"name":"opened","type":"bool"},{"name":"location","type":"string"},{"name":"error","type":"string"}],"name":"state","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"},{"name":"secret","type":"string"}],"name":"setSecret","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"},{"name":"index","type":"uint256"}],"name":"getState","outputs":[{"name":"ok","type":"bool"},{"name":"opened","type":"bool"},{"name":"location","type":"string"},{"name":"error","type":"string"},{"name":"timestamp","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"}],"name":"addBox","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"}],"name":"close","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]');
+
+        const YashchexContract = web3.eth.contract(abi);
+
+        const yashchex = YashchexContract.at('0xbc4718d51b040351bd52214f60395f4e002ed4f6');
+        console.log(yashchex);
+
+        function getBoxes() {
+            return new Promise(resolve => {
+                yashchex.getBoxes((error, boxes) => {
+                    console.log('boxes:', boxes)
+                    resolve(boxes);
+                })
+            })
+        }
+
+        function addBox(box) {
+            return new Promise(resolve => {
+                yashchex.addBox(box, (error, res) => {
+                    console.log('addBox success:', error == null)
+                    resolve(res);
+                })
+            })
+        }
+
+        function setReceiver(box, receiver) {
+            return new Promise(resolve => {
+                yashchex.setReceiver(box, receiver, (error, res) => {
+                    console.log('setReceiver success:', error == null)
+                    yashchex.close(box, receiver, (error, res) => {
+                        console.log('close success:', error == null)
+                        resolve(res);
+                    })
+                })
+            })
+        }
+
+        function setSecret(box, secret) {
+            return new Promise(resolve => {
+                // const hash = kessak('keccak256').update(secret).digest('hex');
+                yashchex.setSecret(box, secret, (error, res) => {
+                    console.log('setReceiver success:', error == null)
+                    resolve(res);
+                })
+            })
+        }
+
+        function onClick() {
+            const box = '0x123f681646d4a755815f9cb19e1acc8565a0c2ac'
+            const receiver = '0x1C42B66fC4fD2dfF7182d42678729788f20dc8C8'
+            addBox(box)
+                .then(res1 => {
+                    getBoxes().then(boxes => {
+                        console.log('successfully got boxes!')
+                    })
+                    setReceiver(box, receiver).then(res2 => {
+                        console.log('successfully set receiver!')
+                        setSecret(box, 'secret').then(res3 => {
+                            console.log('successfully set secret!')
+                        })
+                    })
+
+                })
+
+        }
+    </script>
 </head>
 <body>
 <div class="jumbotron text-center">
@@ -30,6 +110,7 @@
             <p>0x493c4afb73b490e988650b9758e7736c72af748f</p>
         </div>
     </div>
+    <button onclick="onClick()">Boxes</button>
 </div>
 </body>
 </html>

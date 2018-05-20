@@ -1,3 +1,5 @@
+const web3 = require('./src/web3');
+
 const express = require('express');
 const app = express();
 
@@ -6,6 +8,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/src/index.html');
+});
+
+app.get('/boxes', function (req, res) {
+    web3.getBoxes().then(boxes => {
+        res.send(boxes);
+    })
 });
 
 app.post('/submit-student-data', function (req, res) {
