@@ -150,12 +150,36 @@
     }
 
     function setBox(box) {
-        box = box;
-        $("#sender_box").value = box;
+        const form = (box) =>
+            `<form id="modalForm">
+                            <h3>Ящик</h3>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="sender_box_span">Коробка</span>
+                                </div>
+                                <input type="text" readonly class="form-control" id="sender_box" onloadstart="getBox()"
+                                       aria-describedby="basic-addon3"
+                                       value="${box}">
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="sender_receiver_span">Получатель</span>
+                                </div>
+                                <input type="text" class="form-control" id="sender_receiver"
+                                       aria-describedby="basic-addon3">
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal" data-target="#modalSendBox" onclick="sendBox('${box}', jQuery('#sender_receiver').val())">
+                                <i class="fas fa-parachute-box"></i>
+                                Отправить
+                            </button>
+                        </form>`
+        jQuery('#sender-from-container').html(form(box))
     }
 
-    function getBox() {
-        $("#sender_box").value = box;
+    function sendBox(box, receiver) {
+        setReceiver(box, receiver)
     }
 
     function selectBox(box) {
@@ -166,10 +190,10 @@
 
     function renderBoxes() {
         const boxes = ['0xca30e63200a0fe3182dc61fc5605efc41456f32', '0x493c4afb73b490e988650b9758e7736c72af748f']
-        const boxDiv = (box) =>
-            `<div id="box-${box}" class="box-container col-sm-4">
-                <form onclick="selectBox('${box}')">
-                    <h3>Ящик</span></h3>
+        const renderBox = (box, index) =>
+            `<div class="box-container col-sm-4">
+                <form id="box-${box}" onclick="selectBox('${box}')">
+                    <h3>Ящик ${index+1}</span></h3>
                     <input type="text" readonly class="form-control-plaintext" id="address_box_1"
                            value="${box}">
                     <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal"
@@ -179,7 +203,7 @@
                     </button>
                 </form>
             </div>`
-        jQuery('#boxes-container').html(boxes.map(box => boxDiv(box)))
+        jQuery('#boxes-container').html(boxes.map(renderBox))
     }
 </script>
 
@@ -204,31 +228,8 @@
         <div class="modal fade" id="modalSendBox" tabindex="-1" role="dialog" onload="getBox()">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <div class="modal-body">
-                        <form id="modalForm" onchange="getBox()">
-                            <h3>Ящик 2</h3>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="sender_box_span">Коробка</span>
-                                </div>
-                                <input type="text" readonly class="form-control" id="sender_box" onloadstart="getBox()"
-                                       aria-describedby="basic-addon3"
-                                       value="0x493c4afb73b490e988650b9758e7736c72af748f">
-                            </div>
+                    <div class="modal-body" id="sender-from-container">
 
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="sender_receiver_span">Получатель</span>
-                                </div>
-                                <input type="text" class="form-control" id="sender_receiver"
-                                       aria-describedby="basic-addon3">
-                            </div>
-
-                            <button type="submit" class="btn btn-primary btn-warning btn-lg"><i
-                                    class="fas fa-parachute-box"></i>
-                                Отправить
-                            </button>
-                        </form>
                     </div>
                 </div>
             </div>
