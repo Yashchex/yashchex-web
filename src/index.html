@@ -124,7 +124,7 @@
         }
     </script>
 </head>
-<body>
+<body onload="renderStates()">
 <script>
     FontAwesomeConfig = {searchPseudoElements: true};
     var box = "";
@@ -303,12 +303,11 @@
     <button onclick="onClick()">Boxes</button>
 </div>
 
-<div id="box_div" style="display: none">
+<div id="box_div">
     <div class="container" id="box_container">
 
     </div>
 </div>
-
 
 <script>
 
@@ -323,19 +322,37 @@
 
     function renderStates(box) {
         getStates().then(states => {
-            jQuery('#box_container').html(states.map(state => renderState(state)))
+            const rows = states.map(state => renderState(state))
+            const table =
+                `<div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Состояние</th>
+                                <th>Открыт</th>
+                                <th>Локация</th>
+                                <th>Ошибка</th>
+                                <th>Время</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>`
+            jQuery('#box_container').html(table)
         })
     }
 
     function renderState(state) {
         return (
-            `<div class="jumbotron">
-                <p><b>Состояние: </b>${state.ok}</p>
-                <p><b>Открыт: </b>${state.opened}</p>
-                <p><b>Локация: </b>${state.location}</p>
-                <p><b>Ошибка: </b>${state.error}</p>
-                <p><b>Время: </b>${state.timestamp}</p>
-            </div>`
+            `<tr style="background-color: ${state.ok ? 'lightgreen' : 'pink'}">
+                <td>${state.ok ? 'OK' : 'DAMAGED!'}</td>
+                <td>${state.opened ? 'Открыт' : 'Закрыт'}</td>
+                <td>${state.location}</td>
+                <td>${state.error}</td>
+                <td>${state.timestamp ? new Date(state.timestamp).toString() : ''}</td>
+            </tr>`
         )
     }
 
