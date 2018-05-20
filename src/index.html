@@ -34,14 +34,15 @@
             // set the provider you want from Web3.providers
             web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
         }
+        console.log('accounts: ', web3.eth.accounts)
         web3.eth.defaultAccount = web3.eth.accounts[0];
-        console.log(web3.eth.accounts)
 
         const abi = JSON.parse('[{"constant":true,"inputs":[],"name":"getBoxes","outputs":[{"name":"","type":"address[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"}],"name":"getLastState","outputs":[{"name":"ok","type":"bool"},{"name":"opened","type":"bool"},{"name":"location","type":"string"},{"name":"error","type":"string"},{"name":"timestamp","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"}],"name":"ifCanBeOpened","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"},{"name":"receiver","type":"address"}],"name":"setReceiver","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"},{"name":"secret","type":"string"}],"name":"open","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"}],"name":"getStatesCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"ok","type":"bool"},{"name":"opened","type":"bool"},{"name":"location","type":"string"},{"name":"error","type":"string"}],"name":"state","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"},{"name":"secret","type":"string"}],"name":"setSecret","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"},{"name":"index","type":"uint256"}],"name":"getState","outputs":[{"name":"ok","type":"bool"},{"name":"opened","type":"bool"},{"name":"location","type":"string"},{"name":"error","type":"string"},{"name":"timestamp","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"}],"name":"addBox","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"}],"name":"close","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]');
 
         const YashchexContract = web3.eth.contract(abi);
 
         const yashchex = YashchexContract.at('0xbc4718d51b040351bd52214f60395f4e002ed4f6');
+
         console.log(yashchex);
 
         function getBoxes() {
@@ -101,17 +102,60 @@
         }
 
         function onClick() {
-            const box = '0x123f681646d4a755815f9cb19e1acc8565a0c2ac'
+            const box = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
             const receiver = '0x1C42B66fC4fD2dfF7182d42678729788f20dc8C8'
-            getBoxes().then(boxes => {
-                console.log('successfully got boxes!')
-            })
-            setReceiver(box, receiver).then(res2 => {
-                console.log('successfully set receiver!')
-                setSecret(box, 'secret').then(res3 => {
-                    console.log('successfully set secret!')
+
+            const states = [
+                {ok: true, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526810453663},
+                {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526811453663},
+                {ok: true, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526812453663},
+                {ok: false, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526813453663}
+            ]
+
+            web3.eth.defaultAccount = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
+            const s = states[0]
+            console.log('setting state ', s)
+            yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
+                console.log('set state:', error == null, error)
+                const s = states[1]
+                console.log('setting state ', s)
+                yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
+                    console.log('set state:', error == null, error)
+                    const s = states[2]
+                    console.log('setting state ', s)
+                    yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
+                        console.log('set state:', error == null, error)
+                        const s = states[3]
+                        console.log('setting state ', s)
+                        yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
+                            console.log('set state:', error == null, error)
+                        })
+                    })
                 })
             })
+
+
+            // const s = states[0]
+            // console.log('setting state ', s)
+            // states.forEach(s => {
+            //     console.log('setting state ', s)
+            //     web3.eth.defaultAccount = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
+            //     yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
+            //         console.log('set state:', error == null, error)
+            //     })
+            //     web3.eth.defaultAccount = web3.eth.accounts[0];
+            // })
+
+
+            // getBoxes().then(boxes => {
+            //     console.log('successfully got boxes!')
+            // })
+            // setReceiver(box, receiver).then(res2 => {
+            //     console.log('successfully set receiver!')
+            //     setSecret(box, 'secret').then(res3 => {
+            //         console.log('successfully set secret!')
+            //     })
+            // })
             // addBox(box)
             //     .then(res1 => {
             //         getBoxes().then(boxes => {
@@ -313,18 +357,43 @@
             </div>
         </div>
     </div>
-    <!--<button onclick="onClick()">Boxes</button>-->
+    <button onclick="onClick()">Boxes</button>
 </div>
 
 <script>
 
     function getStates() {
-        return Promise.resolve([
-            {ok: true, opened: true, location: '123,321', error: 0, timestamp: 123456},
-            {ok: true, opened: false, location: '654,876', error: 0, timestamp: 123457},
-            {ok: true, opened: true, location: '934,635', error: 0, timestamp: 123458},
-            {ok: true, opened: true, location: '549,384', error: 0, timestamp: 123459}
-        ])
+        return new Promise(resolve1 => {
+            const box = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
+            yashchex.getStatesCount(box, (error, res) => {
+                console.log('getStatesCount success: ', error == null)
+                console.log('count: ', res.c[0])
+                const requests = []
+                for(let i=res-1; i >= res-5 && i>=0; i--) {
+                    requests.push(new Promise(resolve => {
+                        yashchex.getState(box, i, (error, res) => {
+                            resolve({
+                                ok: res[0],
+                                opened: res[1],
+                                location: res[2],
+                                error: res[3],
+                                timestamp: res[4].c[0],
+                            })
+                        })
+                    }))
+                }
+                Promise.all(requests).then(states => {
+                    console.log('states:', states)
+                    resolve1(states)
+                })
+            })
+        })
+        // return Promise.resolve([
+        //     {ok: true, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526810453663},
+        //     {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526811453663},
+        //     {ok: true, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526812453663},
+        //     {ok: false, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526813453663}
+        // ])
     }
 
     function renderStates(box) {
@@ -352,13 +421,14 @@
     }
 
     function renderState(state) {
+        const d = new Date(state.timestamp*1000)
         return (
-            `<tr style="background-color: ${state.ok ? 'lightgreen' : 'pink'}">
+            `<tr ${!state.ok ? 'style="background-color: pink"' : ''}>
                 <td>${state.ok ? 'OK' : 'DAMAGED!'}</td>
                 <td>${state.opened ? 'Открыт' : 'Закрыт'}</td>
                 <td>${state.location}</td>
                 <td>${state.error}</td>
-                <td>${state.timestamp ? new Date(state.timestamp).toString() : ''}</td>
+                <td>${d.toLocaleDateString()} ${d.toLocaleTimeString()}</td>
             </tr>`
         )
     }
