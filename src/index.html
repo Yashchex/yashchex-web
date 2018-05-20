@@ -27,7 +27,7 @@
 <body>
 <script>
     FontAwesomeConfig = {searchPseudoElements: true};
-    var sender = true;
+    var box = "";
 
     function hideSender() {
         var s = document.getElementById("sender_div");
@@ -44,11 +44,20 @@
             r.style.display = "none";
         }
     }
+
+    function setBox(box) {
+        box = box;
+        $("#sender_box").value = box;
+    }
+
+    function getBox() {
+        $("#sender_box").value = box;
+    }
 </script>
 
 <div class="row well well-lg">
     <div class="col-md-6 col-md-offset-3">
-        <input type="checkbox" data-toggle="toggle"data-size="large" data-offstyle="warning"
+        <input type="checkbox" data-toggle="toggle" data-size="large" data-offstyle="warning"
                data-onstyle="info" data-off="Отправитель" data-on="Получатель" aria-expanded="true"
                onchange="hideSender()">
     </div>
@@ -67,7 +76,9 @@
                     <input type="text" readonly class="form-control-plaintext" id="address_box_1"
                            value="0xca30e63200a0fe3182dc61fc5605efc41456f32">
                     <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal"
-                            data-target="#modalSendBox"><i class="fas fa-parachute-box"></i> Отправить
+                            data-target="#modalSendBox"
+                            onclick="setBox('0xca30e63200a0fe3182dc61fc5605efc41456f32')"><i
+                            class="fas fa-parachute-box"></i> Отправить
                     </button>
                 </form>
             </div>
@@ -76,24 +87,26 @@
                     <h3>Ящик 2</h3><span class="glyphicon glyphicon-search"></span>
                     <input type="text" readonly class="form-control-plaintext" id="address_box_2"
                            value="0x493c4afb73b490e988650b9758e7736c72af748f">
-                    <button type="submit" class="btn btn-primary btn-warning btn-lg" data-toggle="modal"
-                            data-target="#modalSendBox"><i class="fas fa-parachute-box"></i> Отправить
+                    <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal"
+                            data-target="#modalSendBox"
+                            onclick="setBox('0x493c4afb73b490e988650b9758e7736c72af748f')"><i
+                            class="fas fa-parachute-box"></i> Отправить
                     </button>
                 </form>
             </div>
         </div>
 
-        <div class="modal fade" id="modalSendBox" tabindex="-1" role="dialog">
+        <div class="modal fade" id="modalSendBox" tabindex="-1" role="dialog" onload="getBox()">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <form>
+                        <form id="modalForm" onchange="getBox()">
                             <h3>Ящик 2</h3>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="sender_box_span">Коробка</span>
                                 </div>
-                                <input type="text" readonly class="form-control" id="sender_box"
+                                <input type="text" readonly class="form-control" id="sender_box" onloadstart="getBox()"
                                        aria-describedby="basic-addon3"
                                        value="0x493c4afb73b490e988650b9758e7736c72af748f">
                             </div>
@@ -102,7 +115,8 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="sender_receiver_span">Получатель</span>
                                 </div>
-                                <input type="text" class="form-control" id="sender_receiver" aria-describedby="basic-addon3">
+                                <input type="text" class="form-control" id="sender_receiver"
+                                       aria-describedby="basic-addon3">
                             </div>
 
                             <button type="submit" class="btn btn-primary btn-warning btn-lg"><i
@@ -129,28 +143,102 @@
                 <input type="text" class="form-control" id="receiver_box" aria-describedby="basic-addon3">
             </div>
 
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="receiver_hash_span">Hash</span>
-                </div>
-                <input type="text" class="form-control" id="receiver_hash" aria-describedby="basic-addon3">
-            </div>
+            <button type="button" data-toggle="modal" data-target="#modalReceiveSecret" class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
+                Задать секрет
+            </button>
 
-
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="receiver_secret_span">Секрет</span>
-                </div>
-                <input type="text" class="form-control" id="receiver_secret" aria-describedby="basic-addon3">
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
-                Подтвердить получение
+            <button type="button" data-toggle="modal" data-target="#modalReceiveOpen" class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
+                Открыть ящик
             </button>
         </form>
+
+        <div class="modal fade" id="modalReceiveSecret" tabindex="-1" role="dialog" onload="getBox()">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <form id="modalForm2" onchange="getBox()">
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="sender_receiver_span2">Секрет</span>
+                                </div>
+                                <input type="text" class="form-control" id="sender_receiver2"
+                                       aria-describedby="basic-addon3">
+                            </div>
+
+                            <button type="button" data-toggle="modal" data-target="#modalReceiveSecret"
+                                    class="btn btn-primary btn-warning btn-lg">
+                                Задать
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalReceiveOpen" tabindex="-1" role="dialog" onload="getBox()">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <form id="modalForm3" onchange="getBox()">
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="sender_receiver_span3">Секрет</span>
+                                </div>
+                                <input type="text" class="form-control" id="sender_receiver3"
+                                       aria-describedby="basic-addon3">
+                            </div>
+
+                            <button type="button" data-toggle="modal" data-target="#modalReceiveOpen"
+                                    class="btn btn-primary btn-warning btn-lg">
+                                Открыть
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+<div id="box_div" style="display: none">
+    <div class="container" id="box_container">
+
+    </div>
+</div>
+
+
+<script>
+
+    function getStates() {
+        return Promise.resolve([
+            {ok: true, opened: true, location: '123,321', error: 0, timestamp: 123456},
+            {ok: true, opened: false, location: '654,876', error: 0, timestamp: 123457},
+            {ok: true, opened: true, location: '934,635', error: 0, timestamp: 123458},
+            {ok: true, opened: true, location: '549,384', error: 0, timestamp: 123459}
+        ])
+    }
+
+    function renderStates(box) {
+        getStates().then(states => {
+            jQuery('#box_container').html(states.map(state => renderState(state)))
+        })
+    }
+
+    function renderState(state) {
+        return (
+            `<div class="jumbotron">
+                <p><b>Состояние: </b>${state.ok}</p>
+                <p><b>Открыт: </b>${state.opened}</p>
+                <p><b>Локация: </b>${state.location}</p>
+                <p><b>Ошибка: </b>${state.error}</p>
+                <p><b>Время: </b>${state.timestamp}</p>
+            </div>`
+        )
+    }
+
+</script>
 
 </body>
 </html>
