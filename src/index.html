@@ -109,38 +109,58 @@
             })
         }
 
+        function addBox() {
+            web3.eth.defaultAccount = web3.eth.accounts[0];
+            yashchex.addBox(box, (error, res) => {
+                console.log('added box')
+            })
+        }
+
         function onClick() {
+            const sender = '0x1C42B66fC4fD2dfF7182d42678729788f20dc8C8'
             const box = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
-            const receiver = '0x1C42B66fC4fD2dfF7182d42678729788f20dc8C8'
+            web3.eth.defaultAccount = web3.eth.accounts[0];
 
             const states = [
                 {ok: true, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526810453663},
                 {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526811453663},
-                {ok: true, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526812453663},
-                {ok: false, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526813453663}
+                {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526812453663},
+                {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526813453663},
+                {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526813453663}
             ]
 
-            web3.eth.defaultAccount = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
             const s = states[0]
             console.log('setting state ', s)
-            yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
-                console.log('set state:', error == null, error)
-                const s = states[1]
-                console.log('setting state ', s)
+            setTimeout(() => {
                 yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
-                    console.log('set state:', error == null, error)
+                    const s = states[0]
+                    console.log('setting state ', s)
+                })
+            }, 0)
+            setTimeout(() => {
+                yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
+                    const s = states[1]
+                    console.log('setting state ', s)
+                })
+            }, 5000)
+            setTimeout(() => {
+                yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
                     const s = states[2]
                     console.log('setting state ', s)
-                    yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
-                        console.log('set state:', error == null, error)
-                        const s = states[3]
-                        console.log('setting state ', s)
-                        yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
-                            console.log('set state:', error == null, error)
-                        })
-                    })
                 })
-            })
+            }, 10000)
+            setTimeout(() => {
+                yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
+                    const s = states[3]
+                    console.log('setting state ', s)
+                })
+            }, 15000)
+            setTimeout(() => {
+                yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
+                    const s = states[4]
+                    console.log('setting state ', s)
+                })
+            }, 20000)
 
 
             // const s = states[0]
@@ -250,10 +270,10 @@
     }
 
     function renderBoxes() {
-        const boxes = ['0xca30e63200a0fe3182dc61fc5605efc41456f32', '0x493c4afb73b490e988650b9758e7736c72af748f']
+        const boxes = ['0xca30e63200a0fe3182dc61fc5605efc41456f32', '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D']
         const renderBox = (box, index) =>
-            `<div class="box-container col-sm-4">
-                <form id="box-${box}" onclick="selectBox('${box}')">
+            `<div class="col-sm-4">
+                <form id="box-${box}" class="box-container" onclick="selectBox('${box}')">
                     <h3>Ящик ${index + 1}</span></h3>
                     <input type="text" readonly class="form-control-plaintext" id="address_box_1"
                            value="${box}">
@@ -344,14 +364,6 @@
                                        aria-describedby="basic-addon3">
                             </div>
 
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="sender_box_span">Коробка</span>
-                                </div>
-                                <input type="text" readonly class="form-control" id="input_hash"
-                                       aria-describedby="basic-addon3">
-                            </div>
-
                             <button type="button" data-toggle="modal" data-target="#modalReceiveSecret"
                                     class="btn btn-primary btn-warning btn-lg"
                                     onclick="setSecret(jQuery('#receiver_box').val(), jQuery('#sender_receiver2').val())">
@@ -388,14 +400,15 @@
             </div>
         </div>
     </div>
-    <button onclick="onClick()">Boxes</button>
+    <button onclick="addBox()">Add box</button>
+    <button onclick="onClick()">States</button>
 </div>
 
 <script>
 
-    function getStates() {
+    function getStates(box) {
         return new Promise(resolve1 => {
-            const box = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
+            // const box = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
             yashchex.getStatesCount(box, (error, res) => {
                 console.log('getStatesCount success: ', error == null)
                 console.log('count: ', res.c[0])
@@ -428,7 +441,7 @@
     }
 
     function renderStates(box) {
-        getStates().then(states => {
+        getStates(box).then(states => {
             const rows = states.map(state => renderState(state))
             const table =
                 `<div class="table-responsive">
