@@ -26,9 +26,11 @@
 
     <script src="../node_modules/web3/dist/web3-light.js"></script>
     <script src="../node_modules/keccak/index.js"></script>
-    <script src="./utils.js"></script>
+    <script src="//cdn.rawgit.com/chrisveness/crypto/4e93a4d/sha3.js"></script>
 
     <script>
+        // console.log(keccak('keccak256').update('Hello World!')._resetState().digest('hex'))
+
         if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
         } else {
@@ -176,6 +178,10 @@
             //
             //     })
 
+        }
+
+        function recalcHash(secret) {
+            jQuery('#hash_input').val(Sha3.hash256(secret))
         }
     </script>
 </head>
@@ -326,7 +332,15 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="sender_receiver_span2">Секрет</span>
                                 </div>
-                                <input type="text" class="form-control" id="sender_receiver2"
+                                <input type="text" class="form-control" id="sender_receiver2" oninput="recalcHash(this.value)"
+                                       aria-describedby="basic-addon3">
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="sender_receiver_span4">Hash</span>
+                                </div>
+                                <input type="text" class="form-control" readonly id="hash_input"
                                        aria-describedby="basic-addon3">
                             </div>
 
