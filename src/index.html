@@ -90,7 +90,7 @@
             })
         }
 
-        function open(box, secret) {
+        function openBox(box, secret) {
             console.log(`open(box: ${box}, secret: ${secret})`)
             return new Promise(resolve => {
                 yashchex.open(box, secret, (error, res) => {
@@ -162,7 +162,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="sender_box_span">Коробка</span>
                                 </div>
-                                <input type="text" readonly class="form-control" id="sender_box" onloadstart="getBox()"
+                                <input type="text" readonly class="form-control" id="sender_box"
                                        aria-describedby="basic-addon3"
                                        value="${box}">
                             </div>
@@ -231,7 +231,7 @@
 
         </div>
 
-        <div class="modal fade" id="modalSendBox" tabindex="-1" role="dialog" onload="getBox()">
+        <div class="modal fade" id="modalSendBox" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-body" id="sender-from-container">
@@ -265,11 +265,11 @@
             </button>
         </form>
 
-        <div class="modal fade" id="modalReceiveSecret" tabindex="-1" role="dialog" onload="getBox()">
+        <div class="modal fade" id="modalReceiveSecret" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <form id="modalForm2" onchange="getBox()">
+                        <form id="modalForm2">
 
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
@@ -289,11 +289,11 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modalReceiveOpen" tabindex="-1" role="dialog" onload="getBox()">
+        <div class="modal fade" id="modalReceiveOpen" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <form id="modalForm3" onchange="getBox()">
+                        <form id="modalForm3">
 
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
@@ -304,7 +304,7 @@
                             </div>
 
                             <button type="button" data-toggle="modal" data-target="#modalReceiveOpen"
-                                    class="btn btn-primary btn-warning btn-lg">
+                                    class="btn btn-primary btn-warning btn-lg" onclick="openBox(jQuery('#receiver_box').val(), jQuery('#sender_receiver3').val())">
                                 Открыть
                             </button>
                         </form>
@@ -313,7 +313,7 @@
             </div>
         </div>
     </div>
-    <button onclick="onClick()">Boxes</button>
+    <!--<button onclick="onClick()">Boxes</button>-->
 </div>
 
 <script>
