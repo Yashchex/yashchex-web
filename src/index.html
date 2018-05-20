@@ -111,14 +111,14 @@
 
         function addBox() {
             web3.eth.defaultAccount = web3.eth.accounts[0];
-            yashchex.addBox(box, (error, res) => {
+            yashchex.addBox('0x829fcd3d2f72a3f9bc95f48392cf2155b7daedcb', (error, res) => {
                 console.log('added box')
             })
         }
 
         function onClick() {
             const sender = '0x1C42B66fC4fD2dfF7182d42678729788f20dc8C8'
-            const box = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
+            const box = '0x829fcd3d2f72a3f9bc95f48392cf2155b7daedcb'
             web3.eth.defaultAccount = web3.eth.accounts[0];
 
             const states = [
@@ -167,7 +167,7 @@
             // console.log('setting state ', s)
             // states.forEach(s => {
             //     console.log('setting state ', s)
-            //     web3.eth.defaultAccount = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
+            //     web3.eth.defaultAccount = '0x829fcd3d2f72a3f9bc95f48392cf2155b7daedcb'
             //     yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
             //         console.log('set state:', error == null, error)
             //     })
@@ -270,7 +270,7 @@
     }
 
     function renderBoxes() {
-        const boxes = ['0xca30e63200a0fe3182dc61fc5605efc41456f32', '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D']
+        const boxes = ['0xca30e63200a0fe3182dc61fc5605efc41456f32', '0x829fcd3d2f72a3f9bc95f48392cf2155b7daedcb']
         const renderBox = (box, index) =>
             `<div class="col-sm-4">
                 <form id="box-${box}" class="box-container" onclick="selectBox('${box}')">
@@ -279,7 +279,7 @@
                            value="${box}">
                     <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal"
                             data-target="#modalSendBox"
-                            onclick="setBox('0xca30e63200a0fe3182dc61fc5605efc41456f32')"><i
+                            onclick="setBox('${box}')"><i
                             class="fas fa-parachute-box"></i> Отправить
                     </button>
                 </form>
@@ -408,7 +408,7 @@
 
     function getStates(box) {
         return new Promise(resolve1 => {
-            // const box = '0xf0c868C8B1c0dc4ca5B62129a935665E2879025D'
+            // const box = '0x829fcd3d2f72a3f9bc95f48392cf2155b7daedcb'
             yashchex.getStatesCount(box, (error, res) => {
                 console.log('getStatesCount success: ', error == null)
                 console.log('count: ', res.c[0])
