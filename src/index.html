@@ -26,6 +26,7 @@
 
     <script src="../node_modules/web3/dist/web3-light.js"></script>
     <script src="../node_modules/keccak/index.js"></script>
+    <script src="./utils.js"></script>
 
     <script>
         if (typeof web3 !== 'undefined') {
@@ -46,6 +47,7 @@
         console.log(yashchex);
 
         function getBoxes() {
+            web3.eth.defaultAccount = web3.eth.accounts[0];
             console.log(`getBoxes()`)
             return new Promise(resolve => {
                 yashchex.getBoxes((error, boxes) => {
@@ -56,6 +58,7 @@
         }
 
         function addBox(box) {
+            web3.eth.defaultAccount = web3.eth.accounts[0];
             console.log(`addBox(box: ${box})`)
             return new Promise(resolve => {
                 // yashchex.addBox(box)
@@ -68,6 +71,7 @@
         }
 
         function setReceiver(box, receiver) {
+            web3.eth.defaultAccount = web3.eth.accounts[0];
             console.log(`setReceiver(box: ${box}, receiver: ${receiver})`)
             return new Promise(resolve => {
                 yashchex.setReceiver(box, receiver, (error, res) => {
@@ -81,6 +85,7 @@
         }
 
         function setSecret(box, secret) {
+            web3.eth.defaultAccount = web3.eth.accounts[0];
             console.log(`setSecret(box: ${box}, secret: ${secret})`)
             return new Promise(resolve => {
                 // const hash = kessak('keccak256').update(secret).digest('hex');
@@ -92,6 +97,7 @@
         }
 
         function openBox(box, secret) {
+            web3.eth.defaultAccount = web3.eth.accounts[0];
             console.log(`open(box: ${box}, secret: ${secret})`)
             return new Promise(resolve => {
                 yashchex.open(box, secret, (error, res) => {
@@ -242,7 +248,7 @@
         const renderBox = (box, index) =>
             `<div class="box-container col-sm-4">
                 <form id="box-${box}" onclick="selectBox('${box}')">
-                    <h3>Ящик ${index+1}</span></h3>
+                    <h3>Ящик ${index + 1}</span></h3>
                     <input type="text" readonly class="form-control-plaintext" id="address_box_1"
                            value="${box}">
                     <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal"
@@ -254,7 +260,6 @@
             </div>`
         jQuery('#boxes-container').html(boxes.map(renderBox))
     }
-
 </script>
 
 <div class="row well well-lg">
@@ -300,11 +305,13 @@
                 <input type="text" class="form-control" id="receiver_box" aria-describedby="basic-addon3">
             </div>
 
-            <button type="button" data-toggle="modal" data-target="#modalReceiveSecret" class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
+            <button type="button" data-toggle="modal" data-target="#modalReceiveSecret"
+                    class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
                 Задать секрет
             </button>
 
-            <button type="button" data-toggle="modal" data-target="#modalReceiveOpen" class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
+            <button type="button" data-toggle="modal" data-target="#modalReceiveOpen"
+                    class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
                 Открыть ящик
             </button>
         </form>
@@ -323,8 +330,17 @@
                                        aria-describedby="basic-addon3">
                             </div>
 
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="sender_box_span">Коробка</span>
+                                </div>
+                                <input type="text" readonly class="form-control" id="input_hash"
+                                       aria-describedby="basic-addon3">
+                            </div>
+
                             <button type="button" data-toggle="modal" data-target="#modalReceiveSecret"
-                                    class="btn btn-primary btn-warning btn-lg" onclick="setSecret(jQuery('#receiver_box').val(), jQuery('#sender_receiver2').val())">
+                                    class="btn btn-primary btn-warning btn-lg"
+                                    onclick="setSecret(jQuery('#receiver_box').val(), jQuery('#sender_receiver2').val())">
                                 Задать
                             </button>
                         </form>
@@ -348,7 +364,8 @@
                             </div>
 
                             <button type="button" data-toggle="modal" data-target="#modalReceiveOpen"
-                                    class="btn btn-primary btn-warning btn-lg" onclick="openBox(jQuery('#receiver_box').val(), jQuery('#sender_receiver3').val())">
+                                    class="btn btn-primary btn-warning btn-lg"
+                                    onclick="openBox(jQuery('#receiver_box').val(), jQuery('#sender_receiver3').val())">
                                 Открыть
                             </button>
                         </form>
@@ -369,7 +386,7 @@
                 console.log('getStatesCount success: ', error == null)
                 console.log('count: ', res.c[0])
                 const requests = []
-                for(let i=res-1; i >= res-5 && i>=0; i--) {
+                for (let i = res - 1; i >= res - 5 && i >= 0; i--) {
                     requests.push(new Promise(resolve => {
                         yashchex.getState(box, i, (error, res) => {
                             resolve({
@@ -421,7 +438,7 @@
     }
 
     function renderState(state) {
-        const d = new Date(state.timestamp*1000)
+        const d = new Date(state.timestamp * 1000)
         return (
             `<tr ${!state.ok ? 'style="background-color: pink"' : ''}>
                 <td>${state.ok ? 'OK' : 'DAMAGED!'}</td>
