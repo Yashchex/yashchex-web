@@ -124,8 +124,12 @@
         }
     </script>
 </head>
-<body onload="renderStates()">
+<body onload="init()">
 <script>
+    function init() {
+        renderBoxes()
+    }
+
     FontAwesomeConfig = {searchPseudoElements: true};
     var box = "";
 
@@ -153,6 +157,30 @@
     function getBox() {
         $("#sender_box").value = box;
     }
+
+    function selectBox(box) {
+        jQuery('.box-container').css('background-color', 'white')
+        jQuery(`#box-${box}`).css('background-color', 'rgba(255,193,7, 0.2)')
+        renderStates(box)
+    }
+
+    function renderBoxes() {
+        const boxes = ['0xca30e63200a0fe3182dc61fc5605efc41456f32', '0x493c4afb73b490e988650b9758e7736c72af748f']
+        const boxDiv = (box) =>
+            `<div id="box-${box}" class="box-container col-sm-4">
+                <form onclick="selectBox('${box}')">
+                    <h3>Ящик</span></h3>
+                    <input type="text" readonly class="form-control-plaintext" id="address_box_1"
+                           value="${box}">
+                    <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal"
+                            data-target="#modalSendBox"
+                            onclick="setBox('0xca30e63200a0fe3182dc61fc5605efc41456f32')"><i
+                            class="fas fa-parachute-box"></i> Отправить
+                    </button>
+                </form>
+            </div>`
+        jQuery('#boxes-container').html(boxes.map(box => boxDiv(box)))
+    }
 </script>
 
 <div class="row well well-lg">
@@ -169,31 +197,8 @@
 
 <div id="sender_div" style="display: block">
     <div class="container">
-        <div class="row">
-            <div class="col-sm-4">
-                <form>
-                    <h3>Ящик 1</span></h3>
-                    <input type="text" readonly class="form-control-plaintext" id="address_box_1"
-                           value="0xca30e63200a0fe3182dc61fc5605efc41456f32">
-                    <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal"
-                            data-target="#modalSendBox"
-                            onclick="setBox('0xca30e63200a0fe3182dc61fc5605efc41456f32')"><i
-                            class="fas fa-parachute-box"></i> Отправить
-                    </button>
-                </form>
-            </div>
-            <div class="col-sm-4">
-                <form>
-                    <h3>Ящик 2</h3><span class="glyphicon glyphicon-search"></span>
-                    <input type="text" readonly class="form-control-plaintext" id="address_box_2"
-                           value="0x493c4afb73b490e988650b9758e7736c72af748f">
-                    <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal"
-                            data-target="#modalSendBox"
-                            onclick="setBox('0x493c4afb73b490e988650b9758e7736c72af748f')"><i
-                            class="fas fa-parachute-box"></i> Отправить
-                    </button>
-                </form>
-            </div>
+        <div class="row" id="boxes-container">
+
         </div>
 
         <div class="modal fade" id="modalSendBox" tabindex="-1" role="dialog" onload="getBox()">
@@ -229,6 +234,7 @@
             </div>
         </div>
     </div>
+    <div class="container" id="box_container"></div>
 </div>
 
 <div id="receiver_div" style="display: none">
@@ -301,12 +307,6 @@
         </div>
     </div>
     <button onclick="onClick()">Boxes</button>
-</div>
-
-<div id="box_div">
-    <div class="container" id="box_container">
-
-    </div>
 </div>
 
 <script>
