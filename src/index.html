@@ -8,9 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
           integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
             integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
             crossorigin="anonymous"></script>
@@ -24,62 +22,46 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css"
           integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
-    <script src="../node_modules/web3/dist/web3-light.js"></script>
-    <script src="../node_modules/keccak/index.js"></script>
     <script src="//cdn.rawgit.com/chrisveness/crypto/4e93a4d/sha3.js"></script>
 
     <script>
-        // console.log(keccak('keccak256').update('Hello World!')._resetState().digest('hex'))
-
+        console.log('Choosing web3 provider...')
         if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
+            console.log('using MetaMask as web3 provider')
         } else {
-            // set the provider you want from Web3.providers
             web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+            console.log('using local provider at 8545 port...')
         }
-        console.log('accounts: ', web3.eth.accounts)
         web3.eth.defaultAccount = web3.eth.accounts[0];
+        console.log(`Using ${web3.eth.accounts[0]} as sender account`)
 
         const abi = JSON.parse('[{"constant":true,"inputs":[],"name":"getBoxes","outputs":[{"name":"","type":"address[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"}],"name":"getLastState","outputs":[{"name":"ok","type":"bool"},{"name":"opened","type":"bool"},{"name":"location","type":"string"},{"name":"error","type":"string"},{"name":"timestamp","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"}],"name":"ifCanBeOpened","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"},{"name":"receiver","type":"address"}],"name":"setReceiver","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"},{"name":"secret","type":"string"}],"name":"open","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"}],"name":"getStatesCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"ok","type":"bool"},{"name":"opened","type":"bool"},{"name":"location","type":"string"},{"name":"error","type":"string"}],"name":"state","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"},{"name":"secret","type":"string"}],"name":"setSecret","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"box","type":"address"},{"name":"index","type":"uint256"}],"name":"getState","outputs":[{"name":"ok","type":"bool"},{"name":"opened","type":"bool"},{"name":"location","type":"string"},{"name":"error","type":"string"},{"name":"timestamp","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"}],"name":"addBox","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"box","type":"address"}],"name":"close","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]');
-
         const YashchexContract = web3.eth.contract(abi);
-
-        const yashchex = YashchexContract.at('0xbc4718d51b040351bd52214f60395f4e002ed4f6');
-
-        console.log(yashchex);
+        const contractAddress = '0xbc4718d51b040351bd52214f60395f4e002ed4f6';
+        const yashchex = YashchexContract.at(contractAddress);
+        console.log(`Connected to smart contract ${contractAddress}`)
 
         function getBoxes() {
             web3.eth.defaultAccount = web3.eth.accounts[0];
-            console.log(`getBoxes()`)
             return new Promise(resolve => {
                 yashchex.getBoxes((error, boxes) => {
-                    console.log('boxes:', boxes)
                     resolve(boxes);
-                })
-            })
-        }
-
-        function addBox(box) {
-            web3.eth.defaultAccount = web3.eth.accounts[0];
-            console.log(`addBox(box: ${box})`)
-            return new Promise(resolve => {
-                // yashchex.addBox(box)
-                // resolve(true)
-                yashchex.addBox(box, (error, res) => {
-                    console.log('addBox success:', error == null, error)
-                    resolve(res);
                 })
             })
         }
 
         function setReceiver(box, receiver) {
             web3.eth.defaultAccount = web3.eth.accounts[0];
-            console.log(`setReceiver(box: ${box}, receiver: ${receiver})`)
             return new Promise(resolve => {
+                console.log(`Call contract: setting receiver ${receiver} for box ${box}`)
                 yashchex.setReceiver(box, receiver, (error, res) => {
-                    console.log('setReceiver success:', error == null, error)
+                    error && console.log('Error: ', error)
+                    !error && console.log('Successfully set receiver')
+                    console.log(`Call contract: closing box ${box}`)
                     yashchex.close(box, (error, res) => {
-                        console.log('close success:', error == null, error)
+                        error && console.log('Error: ', error)
+                        !error && console.log('Successfully closed box')
                         resolve(res);
                     })
                 })
@@ -88,11 +70,12 @@
 
         function setSecret(box, secret) {
             web3.eth.defaultAccount = web3.eth.accounts[0];
-            console.log(`setSecret(box: ${box}, secret: ${secret})`)
             return new Promise(resolve => {
+                console.log(`Call contract: setting secret ${secret} for box ${box}`)
                 // const hash = kessak('keccak256').update(secret).digest('hex');
                 yashchex.setSecret(box, secret, (error, res) => {
-                    console.log('setReceiver success:', error == null, error)
+                    error && console.log('Error: ', error)
+                    !error && console.log('Successfully set secret')
                     resolve(res);
                 })
             })
@@ -100,192 +83,35 @@
 
         function openBox(box, secret) {
             web3.eth.defaultAccount = web3.eth.accounts[0];
-            console.log(`open(box: ${box}, secret: ${secret})`)
             return new Promise(resolve => {
+                console.log(`Call contract: openning box ${box} with secret ${secret}`)
                 yashchex.open(box, secret, (error, res) => {
-                    console.log('open success:', error == null, error)
+                    error && console.log('Error: ', error)
+                    !error && console.log('Successfully set secret')
                     resolve(res);
                 })
             })
         }
 
-        function addBox() {
-            web3.eth.defaultAccount = web3.eth.accounts[0];
-            yashchex.addBox('0x829fcd3d2f72a3f9bc95f48392cf2155b7daedcb', (error, res) => {
-                console.log('added box')
-            })
-        }
-
-        function onClick() {
-            const sender = '0x1C42B66fC4fD2dfF7182d42678729788f20dc8C8'
-            const box = '0x829fcd3d2f72a3f9bc95f48392cf2155b7daedcb'
-            web3.eth.defaultAccount = web3.eth.accounts[0];
-
-            const states = [
-                {ok: true, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526810453663},
-                {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526811453663},
-                {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526812453663},
-                {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526813453663},
-                {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526813453663}
-            ]
-
-            const s = states[0]
-            console.log('setting state ', s)
-            setTimeout(() => {
-                yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
-                    const s = states[0]
-                    console.log('setting state ', s)
-                })
-            }, 0)
-            setTimeout(() => {
-                yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
-                    const s = states[1]
-                    console.log('setting state ', s)
-                })
-            }, 5000)
-            setTimeout(() => {
-                yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
-                    const s = states[2]
-                    console.log('setting state ', s)
-                })
-            }, 10000)
-            setTimeout(() => {
-                yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
-                    const s = states[3]
-                    console.log('setting state ', s)
-                })
-            }, 15000)
-            setTimeout(() => {
-                yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
-                    const s = states[4]
-                    console.log('setting state ', s)
-                })
-            }, 20000)
-
-
-            // const s = states[0]
-            // console.log('setting state ', s)
-            // states.forEach(s => {
-            //     console.log('setting state ', s)
-            //     web3.eth.defaultAccount = '0x829fcd3d2f72a3f9bc95f48392cf2155b7daedcb'
-            //     yashchex.state(s.ok, s.opened, s.location, s.error, (error, res) => {
-            //         console.log('set state:', error == null, error)
-            //     })
-            //     web3.eth.defaultAccount = web3.eth.accounts[0];
-            // })
-
-
-            // getBoxes().then(boxes => {
-            //     console.log('successfully got boxes!')
-            // })
-            // setReceiver(box, receiver).then(res2 => {
-            //     console.log('successfully set receiver!')
-            //     setSecret(box, 'secret').then(res3 => {
-            //         console.log('successfully set secret!')
-            //     })
-            // })
-            // addBox(box)
-            //     .then(res1 => {
-            //         getBoxes().then(boxes => {
-            //             console.log('successfully got boxes!')
-            //         })
-            //         setReceiver(box, receiver).then(res2 => {
-            //             console.log('successfully set receiver!')
-            //             setSecret(box, 'secret').then(res3 => {
-            //                 console.log('successfully set secret!')
-            //             })
-            //         })
-            //
-            //     })
-
-        }
-
         function recalcHash(secret) {
-            jQuery('#hash_input').val(Sha3.hash256(secret))
+            $('#hash_input').val(Sha3.hash256(secret))
         }
+
     </script>
 </head>
 <body onload="init()">
 <script>
     function init() {
-        renderBoxes()
+        $('#sender_div').load('sender', () => {renderBoxes()})
+        $('#receiver_div').load('receiver')
     }
-
-    FontAwesomeConfig = {searchPseudoElements: true};
-    var box = "";
 
     function hideSender() {
-        var s = document.getElementById("sender_div");
-        if (s.style.display === "none") {
-            s.style.display = "block";
-        } else {
-            s.style.display = "none";
-        }
-
-        var r = document.getElementById("receiver_div");
-        if (r.style.display === "none") {
-            r.style.display = "block";
-        } else {
-            r.style.display = "none";
-        }
+        $('#sender_div').toggle()
+        $('#receiver_div').toggle()
     }
 
-    function setBox(box) {
-        const form = (box) =>
-            `<form id="modalForm">
-                            <h3>Ящик</h3>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="sender_box_span">Коробка</span>
-                                </div>
-                                <input type="text" readonly class="form-control" id="sender_box"
-                                       aria-describedby="basic-addon3"
-                                       value="${box}">
-                            </div>
 
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="sender_receiver_span">Получатель</span>
-                                </div>
-                                <input type="text" class="form-control" id="sender_receiver"
-                                       aria-describedby="basic-addon3">
-                            </div>
-
-                            <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal" data-target="#modalSendBox" onclick="sendBox('${box}', jQuery('#sender_receiver').val())">
-                                <i class="fas fa-parachute-box"></i>
-                                Отправить
-                            </button>
-                        </form>`
-        jQuery('#sender-from-container').html(form(box))
-    }
-
-    function sendBox(box, receiver) {
-        setReceiver(box, receiver)
-    }
-
-    function selectBox(box) {
-        jQuery('.box-container').css('background-color', 'white')
-        jQuery(`#box-${box}`).css('background-color', 'rgba(255,193,7, 0.2)')
-        renderStates(box)
-    }
-
-    function renderBoxes() {
-        const boxes = ['0xca30e63200a0fe3182dc61fc5605efc41456f32', '0x829fcd3d2f72a3f9bc95f48392cf2155b7daedcb']
-        const renderBox = (box, index) =>
-            `<div class="col-sm-4">
-                <form id="box-${box}" class="box-container" onclick="selectBox('${box}')">
-                    <h3>Ящик ${index + 1}</span></h3>
-                    <input type="text" readonly class="form-control-plaintext" id="address_box_1"
-                           value="${box}">
-                    <button type="button" class="btn btn-primary btn-warning btn-lg" data-toggle="modal"
-                            data-target="#modalSendBox"
-                            onclick="setBox('${box}')"><i
-                            class="fas fa-parachute-box"></i> Отправить
-                    </button>
-                </form>
-            </div>`
-        jQuery('#boxes-container').html(boxes.map(renderBox))
-    }
 </script>
 
 <div class="row well well-lg">
@@ -300,184 +126,9 @@
     <p>Первое решение для криптографической защиты ваших грузов</p>
 </div>
 
-<div id="sender_div" style="display: block">
-    <div class="container">
-        <div class="row" id="boxes-container">
+<div id="sender_div" style="display: block"></div>
 
-        </div>
-
-        <div class="modal fade" id="modalSendBox" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body" id="sender-from-container">
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="container" id="box_container"></div>
-</div>
-
-<div id="receiver_div" style="display: none">
-    <div class="container">
-        <form>
-            <h3>Ящик</h3>
-
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="receiver_box_span">Коробка</span>
-                </div>
-                <input type="text" class="form-control" id="receiver_box" aria-describedby="basic-addon3">
-            </div>
-
-            <button type="button" data-toggle="modal" data-target="#modalReceiveSecret"
-                    class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
-                Задать секрет
-            </button>
-
-            <button type="button" data-toggle="modal" data-target="#modalReceiveOpen"
-                    class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
-                Открыть ящик
-            </button>
-        </form>
-
-        <div class="modal fade" id="modalReceiveSecret" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <form id="modalForm2">
-
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="sender_receiver_span2">Секрет</span>
-                                </div>
-                                <input type="text" class="form-control" id="sender_receiver2" oninput="recalcHash(this.value)"
-                                       aria-describedby="basic-addon3">
-                            </div>
-
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="sender_receiver_span4">Hash</span>
-                                </div>
-                                <input type="text" class="form-control" readonly id="hash_input"
-                                       aria-describedby="basic-addon3">
-                            </div>
-
-                            <button type="button" data-toggle="modal" data-target="#modalReceiveSecret"
-                                    class="btn btn-primary btn-warning btn-lg"
-                                    onclick="setSecret(jQuery('#receiver_box').val(), jQuery('#sender_receiver2').val())">
-                                Задать
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="modalReceiveOpen" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <form id="modalForm3">
-
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="sender_receiver_span3">Секрет</span>
-                                </div>
-                                <input type="text" class="form-control" id="sender_receiver3"
-                                       aria-describedby="basic-addon3">
-                            </div>
-
-                            <button type="button" data-toggle="modal" data-target="#modalReceiveOpen"
-                                    class="btn btn-primary btn-warning btn-lg"
-                                    onclick="openBox(jQuery('#receiver_box').val(), jQuery('#sender_receiver3').val())">
-                                Открыть
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <button onclick="addBox()">Add box</button>
-    <button onclick="onClick()">States</button>
-</div>
-
-<script>
-
-    function getStates(box) {
-        return new Promise(resolve1 => {
-            // const box = '0x829fcd3d2f72a3f9bc95f48392cf2155b7daedcb'
-            yashchex.getStatesCount(box, (error, res) => {
-                console.log('getStatesCount success: ', error == null)
-                console.log('count: ', res.c[0])
-                const requests = []
-                for (let i = res - 1; i >= res - 5 && i >= 0; i--) {
-                    requests.push(new Promise(resolve => {
-                        yashchex.getState(box, i, (error, res) => {
-                            resolve({
-                                ok: res[0],
-                                opened: res[1],
-                                location: res[2],
-                                error: res[3],
-                                timestamp: res[4].c[0],
-                            })
-                        })
-                    }))
-                }
-                Promise.all(requests).then(states => {
-                    console.log('states:', states)
-                    resolve1(states)
-                })
-            })
-        })
-        // return Promise.resolve([
-        //     {ok: true, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526810453663},
-        //     {ok: true, opened: false, location: '55.711601, 37.581640', error: 0, timestamp: 1526811453663},
-        //     {ok: true, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526812453663},
-        //     {ok: false, opened: true, location: '55.711601, 37.581640', error: 0, timestamp: 1526813453663}
-        // ])
-    }
-
-    function renderStates(box) {
-        getStates(box).then(states => {
-            const rows = states.map(state => renderState(state))
-            const table =
-                `<div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th>Состояние</th>
-                                <th>Открыт</th>
-                                <th>Локация</th>
-                                <th>Ошибка</th>
-                                <th>Время</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${rows}
-                        </tbody>
-                    </table>
-                </div>`
-            jQuery('#box_container').html(table)
-        })
-    }
-
-    function renderState(state) {
-        const d = new Date(state.timestamp * 1000)
-        return (
-            `<tr ${!state.ok ? 'style="background-color: pink"' : ''}>
-                <td>${state.ok ? 'OK' : 'DAMAGED!'}</td>
-                <td>${state.opened ? 'Открыт' : 'Закрыт'}</td>
-                <td>${state.location}</td>
-                <td>${state.error}</td>
-                <td>${d.toLocaleDateString()} ${d.toLocaleTimeString()}</td>
-            </tr>`
-        )
-    }
-
-</script>
+<div id="receiver_div" style="display: none"></div>
 
 </body>
 </html>

@@ -1,0 +1,81 @@
+<div class="container">
+    <form>
+        <h3>Ящик</h3>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="receiver_box_span">Коробка</span>
+            </div>
+            <input type="text" class="form-control" id="receiver_box" aria-describedby="basic-addon3">
+        </div>
+
+        <button type="button" data-toggle="modal" data-target="#modalReceiveSecret"
+                class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
+            Задать секрет
+        </button>
+
+        <button type="button" data-toggle="modal" data-target="#modalReceiveOpen"
+                class="btn btn-primary btn-info btn-lg"><i class="fas fa-user-check"></i>
+            Открыть ящик
+        </button>
+    </form>
+
+    <div class="modal fade" id="modalReceiveSecret" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form id="modalForm2">
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="sender_receiver_span2">Секрет</span>
+                            </div>
+                            <input type="text" class="form-control" id="sender_receiver2"
+                                   oninput="recalcHash(this.value)"
+                                   aria-describedby="basic-addon3">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="sender_receiver_span4">Hash</span>
+                            </div>
+                            <input type="text" class="form-control" readonly id="hash_input"
+                                   aria-describedby="basic-addon3">
+                        </div>
+
+                        <button type="button" data-toggle="modal" data-target="#modalReceiveSecret"
+                                class="btn btn-primary btn-warning btn-lg"
+                                onclick="setSecret(jQuery('#receiver_box').val(), jQuery('#sender_receiver2').val())">
+                            Задать
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalReceiveOpen" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form id="modalForm3">
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="sender_receiver_span3">Секрет</span>
+                            </div>
+                            <input type="text" class="form-control" id="sender_receiver3"
+                                   aria-describedby="basic-addon3">
+                        </div>
+
+                        <button type="button" data-toggle="modal" data-target="#modalReceiveOpen"
+                                class="btn btn-primary btn-warning btn-lg"
+                                onclick="openBox(jQuery('#receiver_box').val(), jQuery('#sender_receiver3').val())">
+                            Открыть
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
